@@ -11,13 +11,28 @@
                     vals[entry.name] = entry.value
                     return vals
                 },{});
+                
+                var base_url = form.server;
+                if (base_url.slice(0,8)!="https://" && base_url.slice(0,7)!="http://"){
+                    base_url ="https://"+base_url;
+                }
+                if (base_url.slice(-1)!="/"){
+                    base_url+="/";
+                }
+                
+                var server_url = base_url+"brapi/v1";
+                var auth = form.username ? {'username':username,'password':password} : undefined;
+                var studyIds = form.study.split(",").map(function(s){return s.trim()});
+                
                 $("#load-spin").show();
-                BrAPI(form.server, form.username?{'username':username,'password':password}:undefined)
+                
+                BrAPI(server_url, auth)
                     .phenotypes_search({
-                        "studyDbIds" : form.study.split(",").map(function(s){return s.trim()}),
+                        "studyDbIds" : studyIds,
                         "observationLevel" : form.unit,
                         "pageSize" : 10000000})
                     .all(createSComp);
+                    
                 return false;
             })
         });
