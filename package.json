@@ -20,8 +20,8 @@
   },
   "homepage": "https://github.com/solgenomics/BrAPI-Study-Comparison#readme",
   "dependencies": {
-    "@solgenomics/brapijs": "file:../BrAPI_js",
-    "@solgenomics/brapp-wrapper": "file:../BrApp-Wrapper",
+    "@solgenomics/brapijs": "^0.2.4",
+    "@solgenomics/brapp-wrapper": "^1.0.0",
     "rollup": "^0.56.1"
   },
   "brapp": {
