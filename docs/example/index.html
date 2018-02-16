@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>
+      BrAPI Study Comparison
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+    <div class="forward-container">
+      <form id="brapi-form" action="#" class="form-inline" style="margin:1em;" name="brapi-form">
+        <div class="form-group">
+          <label for="brapi-server">BrAPI Server Adress</label> <input type="text" class="form-control" id="brapi-server" name="server" value="yambase.org">
+        </div>
+        <div class="form-group">
+          <label for="brapi-username">Username</label> <input type="text" class="form-control" id="brapi-username" name="username" placeholder="John_Doe">
+        </div>
+        <div class="form-group">
+          <label for="brapi-password">Password</label> <input type="password" class="form-control" id="brapi-password" name="password" placeholder="••••••••••••">
+        </div><br>
+        <br>
+        <div class="form-group">
+          <label for="brapi-study">Study IDs</label> <input type="text" class="form-control" id="brapi-study" name="study" value="19,20,21">
+        </div>
+        <div class="form-group">
+          <label for="brapi-unit">Unit Type</label> <select id="brapi-unit" class="form-control" name="unit">
+            <option value="plot">
+              Plot
+            </option>
+            <option value="plant">
+              Plant
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" name="group"> Group By Accession</label>
+        </div><input type="submit" action="#" id="load-brapi" class="btn btn-primary" value="Load"> <i id="load-spin" class="fa fa-spinner fa-spin" style="display: none;font-size:14px"></i>
+      </form>
+      <form id="scomp-form" action="#" class="form-inline" style="margin:1em;" name="scomp-form">
+        <div class="form-group">
+          <select id="scomp-select-var" class="form-control" name="variable">
+            <option value="" disabled selected>
+              Select Variable
+            </option>
+          </select>
+        </div><input type="submit" action="#" id="compare" class="btn btn-primary" value="Compare Variable">
+      </form>
+    </div>
+    <div class="brapp-container" style="position:relative;">
+      <div value="brapp-wrapper" style="display:inline-block; border:solid 1px #ccc;border-radius:4px;">
+        <div class="brapp-body">
+          <div id="graph_div" style="margin:1em;float:left;"></div>
+          <div id="hist_div" style="margin:1em;float:left;"></div>
+        </div>
+        <div class="brapp-footer" style="background-color:#ddd;border-top:solid 1px #ccc;font-family:Arial;color:#555;font-size:11px;padding:0.3em;border-bottom-left-radius:4px;border-bottom-right-radius:4px;">
+          <div style="min-height:14px;text-align:right;">
+            <a href="https://github.com/solgenomics/BrAPI-Study-Comparison" style="color:inherit;white-space:nowrap;">Study Comparison</a> developed at <a href="https://btiscience.org/" style="color:inherit;white-space:nowrap;">Boyce Thompson Institute</a>
+          </div>
+        </div>
+      </div>
+    </div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js">
+</script> <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.0/d3.js">
+</script> <script src="BrAPI.js">
+</script> <script src="StudyComparison.js">
+</script> <script type="text/javascript">
+;(function(){
+        
+        $(document).ready(function(){
+            $("#brapi-form").submit(function(){
+                var form = $(this).serializeArray().reduce(function(vals,entry){
+                    vals[entry.name] = entry.value
+                    return vals
+                },{});
+                params = {"studyDbIds" : form.study.split(",").map(function(s){return s.trim()}),
+                          "observationLevel" : form.unit};
+                loadBrAPIData(form.server,params,function(response){
+                    createSComp(response.result.data);
+                },form.username,form.password);
+                return false;
+            })
+        });
+
+        function loadBrAPIData(server,parameters,success,username,password){
+            $("#load-spin").show();
+            var base_url = server;
+            if (base_url.slice(0,8)!="https://" && base_url.slice(0,7)!="http://"){
+                base_url ="https://"+base_url;
+            }
+            if (base_url.slice(-1)!="/"){
+                base_url+="/";
+            }
+            
+            var load_url = base_url+"brapi/v1/phenotypes-search";
+            var data = {
+                "pageSize" : 10000000,
+                "page" : 0
+            };
+            d3.entries(parameters).forEach(function(entry){
+                data[entry.key] = data[entry.key]||entry.value;
+            });
+            
+            if(username){
+                $.ajax({
+                    type: "POST",
+                    url: base_url+"brapi/v1/token",
+                    data: {'username':username,'password':password},
+                    success: function(response){
+                        data["access_token"] = response.access_token;
+                        load();
+                    },
+                });
+            }
+            else {
+                load();
+            }
+            
+            function load(){
+                console.log(data);
+                $.ajax({
+                    type: "POST",
+                    url: load_url,
+                    data: data,
+                    success: function(d){$("#load-spin").hide();success(d);},
+                });
+            }
+        };
+
+        function createSComp(data){
+            var scomp = StudyComparison();
+            var sharedVars = scomp.loadData(data);
+            
+            var varOpts = d3.select("#scomp-select-var")
+                    .selectAll("option:not([disabled])")
+                    .data(sharedVars);
+            varOpts.exit().remove();
+            varOpts.enter().append("option").merge(varOpts)
+                    .attr("value",function(d){return d})
+                    .text(function(d){return d})
+                    .raise();
+                    
+            
+            $("#scomp-form").submit(function(){
+                    scomp.setVariable($("#scomp-select-var").val());
+                    scomp.graphGrid("#graph_div");
+                    scomp.multiHist("#hist_div");
+                    return false;
+            });
+        }
+        
+    })();
+    </script>
+  </body>
+</html>
