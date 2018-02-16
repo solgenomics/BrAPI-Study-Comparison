@@ -5,6 +5,7 @@
 ![GIF of Example Implementation](example.gif)
 
 ### Requirements
-- [BrAPI.js](https://github.com/solgenomics/BrAPI.js)
+- [@solgenomics/brapijs](https://github.com/solgenomics/BrAPI.js)
+- [@solgenomics/brapp-wrapper](https://github.com/solgenomics/BrApp-Wrapper) (For building the example.)
 - [D3.js](https://github.com/d3/d3) (4)
 - [jQuery](https://github.com/jquery/jquery) (3)
