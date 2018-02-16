@@ -12,8 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/solgenomics/BrAPI-Study-Comparison.git"
   },
-  "private": true,
-  "author": "",
+  "author": "David Lyon <npm@dauglyon.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/solgenomics/BrAPI-Study-Comparison/issues"
