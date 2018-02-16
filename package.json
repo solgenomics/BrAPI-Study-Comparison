@@ -8,14 +8,14 @@
   },
   "scripts": {
     "prepare": "rm -rf build && mkdir build && rollup -f umd -n StudyComparison -o build/StudyComparison.js -- main.js",
-    "build_example":"rm -rf docs/example && mkdir docs/example && wrapbrapp && cp build/StudyComparison.js node_modules/@solgenomics/brapijs/build/BrAPI.js docs/example",
+    "build_example": "rm -rf docs/example && mkdir docs/example && wrapbrapp && cp build/StudyComparison.js node_modules/@solgenomics/brapijs/build/BrAPI.js docs/example",
     "version": "npm run prepare && npm run build_example"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/solgenomics/BrAPI-Study-Comparison.git"
   },
-  "private":true,
+  "private": true,
   "author": "",
   "license": "MIT",
   "bugs": {
@@ -33,6 +33,6 @@
     "link": "https://github.com/solgenomics/BrAPI-Study-Comparison",
     "forward": "example_src/forward.html",
     "main": "example_src/main.html",
-    "scripts": "example_src/scripts.html" 
+    "scripts": "example_src/scripts.html"
   }
 }
