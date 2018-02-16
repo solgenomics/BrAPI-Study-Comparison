@@ -1,5 +1,5 @@
 # Comparison of Studies through [BrAPI](https://github.com/plantbreeding/API)
-Try it out [here](https://solgenomics.github.io/BrAPI-Study-Comparison/)
+Try it out [here](https://solgenomics.github.io/BrAPI-Study-Comparison/example)
 
 ![GIF of Example Implementation](example.gif)
 
