@@ -1,0 +1,64 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.0/d3.js"></script>
+<script src="BrAPI.js"></script>
+<script src="StudyComparison.js"></script>
+<script type="text/javascript">
+    ;(function(){
+        
+        $(document).ready(function(){
+            $("#brapi-form").submit(function(){
+                var form = $(this).serializeArray().reduce(function(vals,entry){
+                    vals[entry.name] = entry.value
+                    return vals
+                },{});
+                
+                var base_url = form.server;
+                if (base_url.slice(0,8)!="https://" && base_url.slice(0,7)!="http://"){
+                    base_url ="https://"+base_url;
+                }
+                if (base_url.slice(-1)!="/"){
+                    base_url+="/";
+                }
+                
+                var server_url = base_url+"brapi/v1";
+                var auth = form.username ? {'username':username,'password':password} : undefined;
+                var studyIds = form.study.split(",").map(function(s){return s.trim()});
+                
+                $("#load-spin").show();
+                
+                BrAPI(server_url, auth)
+                    .phenotypes_search({
+                        "studyDbIds" : studyIds,
+                        "observationLevel" : form.unit,
+                        "pageSize" : 10000000})
+                    .all(createSComp);
+                    
+                return false;
+            })
+        });
+
+        function createSComp(data){
+            $("#load-spin").hide();
+            var scomp = StudyComparison();
+            var sharedVars = scomp.loadData(data);
+            
+            var varOpts = d3.select("#scomp-select-var")
+                    .selectAll("option:not([disabled])")
+                    .data(sharedVars);
+            varOpts.exit().remove();
+            varOpts.enter().append("option").merge(varOpts)
+                    .attr("value",function(d){return d})
+                    .text(function(d){return d})
+                    .raise();
+                    
+            
+            $("#scomp-form").submit(function(){
+                    scomp.setVariable($("#scomp-select-var").val());
+                    scomp.graphGrid("#graph_div");
+                    scomp.multiHist("#hist_div");
+                    return false;
+            });
+        }
+        
+    })();
+</script>

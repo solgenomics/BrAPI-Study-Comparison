@@ -1,9 +1,11 @@
-;(function(){
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define(factory) :
+	(global.StudyComparison = factory());
+}(this, (function () { 'use strict';
 
-    // creates a new comparison object
-    window.StudyComparison = StudyComparison;
-    function StudyComparison(){
-        "use strict";
+// creates a new comparison object
+function main(){
         
         var scomp = {};
         // size options and things
@@ -12,7 +14,7 @@
             'axes':30,
             'margins':10,
             'trait':""
-        }
+        };
         
         var rsquare_format = d3.format(".3f");
         
@@ -28,17 +30,17 @@
         scomp.setVariable = function(variable){
             opts.trait = variable;
             return scomp;
-        }
+        };
         
         // sets an option
         scomp.setOpt = function(opt,val){
             opts[opt] = val;
-        }
+        };
         
         // gets an option
         scomp.getOpt = function(opt){
             return opts[opt];
-        }
+        };
         
         // loads and parses an array of observationUnits to be displayed in the comparison
         // returns a list of compareable (shared) traits.
@@ -63,17 +65,17 @@
                     accession.values.forEach(function(unit){
                         unit.observations.forEach(function(obs){
                             if (accession.variables[obs.observationVariableName]==undefined) {
-                                accession.variables[obs.observationVariableName] = []
+                                accession.variables[obs.observationVariableName] = [];
                             } else {
                                 thisStudyVariables[obs.observationVariableName] = true;
                             }
-                            accession.variables[obs.observationVariableName].push(obs.value)
-                        })
-                    })
+                            accession.variables[obs.observationVariableName].push(obs.value);
+                        });
+                    });
                 });
                 d3.keys(thisStudyVariables).forEach(function(k){
                     studyVariables[k] = studyVariables[k]?studyVariables[k]+1:1;
-                })
+                });
                 delete study.values;
             });
             
@@ -86,7 +88,7 @@
                 paired_grid.push([]);
                 for (var col = 1; col < nested.length; col++) {
                     if (row<col){
-                        paired_grid[row].push([nested[row],nested[col]])
+                        paired_grid[row].push([nested[row],nested[col]]);
                     }
                     else {
                         paired_grid[row].push(null);
@@ -98,7 +100,7 @@
             hist_data = nested;
             grid_data = paired_grid;
             return sharedVars;
-        }
+        };
         
         // draws a histogram.
         scomp.multiHist = function(selector){
@@ -117,8 +119,7 @@
                 .classed("mulhst-main",true)
                 .attr("transform","translate(0,"+opts.axes+")");
             newSvg.append("g").classed("mulhst-xaxis",true)
-                .attr("transform","translate(0,"+(opts.size)+")");;
-            newSvg.append("g")
+                .attr("transform","translate(0,"+(opts.size)+")");            newSvg.append("g")
                 .classed("mulhst-yaxis",true)
                 .attr("transform","translate("+opts.axes+","+opts.axes+")");
             var lgnd = newSvg.append("g")
@@ -279,9 +280,9 @@
             var bgheight = bbox.height+opts.margins*2;
             legend.select(".mulhst-legend-bg")
                 .attr("width",bgwidth)
-                .attr("height",bbox.height+opts.margins*2)
-            legend.attr("transform","translate("+(opts.size-bgwidth)+","+(opts.margins*2+opts.axes)+")")
-        }
+                .attr("height",bbox.height+opts.margins*2);
+            legend.attr("transform","translate("+(opts.size-bgwidth)+","+(opts.margins*2+opts.axes)+")");
+        };
         
         // set the histogram to show specfic studies
         scomp.multiHist.showStudies = function(studies){
@@ -343,7 +344,7 @@
                 });
             scomp.multiHist.showStudies(selected);
             return scomp;
-        }
+        };
         
         // draws the comparison grid
         scomp.graphGrid = function(selector){
@@ -540,7 +541,7 @@
                 .attr("stroke","#ddd");
             drawCells.select(".grapgr-cell-bg")
                 .attr("fill","white")
-                .attr("stroke","black")
+                .attr("stroke","black");
             
             // makes comparison axes
             var topLabels = grid_data[0].map(function(d){
@@ -586,7 +587,7 @@
                 var self=this;
                 drawCells.on("click",null);
                 var k = (opts.size-2*opts.margins)/cellSize;
-                var margin_offset = opts.margins - opts.margins/k
+                var margin_offset = opts.margins - opts.margins/k;
                 var xPos = d3.select(this).attr("cxp")*cellOffset + margin_offset;
                 var yPos = d3.select(this).attr("cyp")*cellOffset + margin_offset;
                 main.transition()
@@ -644,7 +645,7 @@
         
         var slope = ssXY / ssXX;
         var yintercept = yBar - (xBar * slope);
-        var xintercept = (-yintercept)/slope
+        var xintercept = (-yintercept)/slope;
         var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
         
         return {'slope':slope, 'yintercept':yintercept, 'xintercept':xintercept, 'rSquare':rSquare};
@@ -663,5 +664,7 @@
             return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
         };
     }
-    
-})();
+
+return main;
+
+})));
