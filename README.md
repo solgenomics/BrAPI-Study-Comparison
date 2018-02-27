@@ -1,7 +1,7 @@
 # [BrAPI](https://github.com/plantbreeding/API) Study Comparison [![GitHub release](https://img.shields.io/github/release/solgenomics/brapi-study-comparison.svg)](https://github.com/solgenomics/BrAPI-Study-Comparison/releases) [![GitHub (Pre-)Release Date](https://img.shields.io/github/release-date-pre/solgenomics/brapi-study-comparison.svg)](https://github.com/solgenomics/BrAPI-Study-Comparison/releases)
 - Try it out [here](https://solgenomics.github.io/BrAPI-Study-Comparison/example).
 - Include-ready version can be found under [releases](https://github.com/solgenomics/BrAPI-Study-Comparison/releases). 
-- Also availible via npm: `npm install @solgenomics/brapi-study-comparison`
+- Also available via npm: `npm install @solgenomics/brapi-study-comparison`
 
 ![GIF of Example Implementation](example.gif)
 
