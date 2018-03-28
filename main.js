@@ -10,6 +10,8 @@ export default function(){
             'trait':""
         }
         
+        var link_maker = null;
+        
         var rsquare_format = d3.format(".3f");
         
         function accessionAccessor(a){
@@ -23,6 +25,11 @@ export default function(){
         // sets the variable to be used for the histogram and comparison grid
         scomp.setVariable = function(variable){
             opts.trait = variable;
+            return scomp;
+        }
+        
+        scomp.links = function(link_m){
+            link_maker = link_m;
             return scomp;
         }
         
@@ -371,6 +378,59 @@ export default function(){
             scomp.ggrid = main;
             var taxis = builtSvg.select(".grapgr-topaxis");
             var laxis = builtSvg.select(".grapgr-leftaxis");
+            
+            var tooltip = newSvg.append("a")
+                .classed("grapgr-tooltip",true)
+                .attr("target","_blank");
+            tooltip.append('rect')
+                .attr('x',-2).attr('y',-2)
+                .attr('width',100)
+                .attr('height',16)
+                .attr('fill','black');
+            tooltip.append('text')
+                .attr('fill','white')
+                .attr('text-decoration','underline')
+                .attr('y',10)
+                .attr('x',1)
+                .attr('font-size','12');
+            tooltip = tooltip.merge(d3.select('.grapgr-tooltip'));
+            var tooltip_timeout = false;
+            var tooltip_hold = false;
+            function set_tooltip(viz,x,y,text,link){
+                if (tooltip_hold) return;
+                console.log(viz,x,y,text);
+                var tt = d3.select('.grapgr-tooltip');
+                var ttrect = tt.select('rect');
+                var tttext = tt.select('text');
+                if (!viz){
+                    if (!tooltip_timeout) tooltip_timeout = setTimeout(function(){
+                        tooltip_timeout = false;
+                        if (tooltip_hold) return;
+                        tt.attr('opacity',0);
+                        tt.attr('transform', 'translate(' + 0 + ',' + -100 + ')');
+                    },200);
+                    return
+                }
+                clearTimeout(tooltip_timeout);
+                tooltip_timeout = false;
+                if (tt.attr('opacity')==1 && text!==undefined && tttext.text()==text) return;
+                tt.attr('opacity',1);
+                tt.attr('transform', 'translate(' + x + ',' + y + ')');
+                tttext.text(text);
+                ttrect.attr('width',tttext.node().getComputedTextLength()+6);
+                if(link){
+                    tt.attr('href',link).style('cursor','pointer');
+                } else {
+                    tt.attr('href',null).on('click',function(){return false;}).style('cursor','auto');
+                }
+            }
+            tooltip.on('mousemove',function(){
+                tooltip_hold=true;
+            });
+            tooltip.on('mouseout',function(){
+                tooltip_hold=false;
+                set_tooltip(false);
+            });
                     
             // calculate grid size
             var cellSize = (opts.size-(opts.margins*(grid_data.length+1)))/grid_data.length;
@@ -481,6 +541,15 @@ export default function(){
                     .attr("cy",function(d){
                         return y(d.yAvg);
                     });
+                
+                allPoints.on('mouseover',function(d){
+                    var newLoc = d3.mouse(d3.select('.grapgr-tooltip').node().parentNode);
+                    var name = d.xObs.values[0].germplasmName;
+                    var link = link_maker?link_maker(d.xObs.values[0].germplasmDbId):undefined;
+                    set_tooltip(true,newLoc[0],newLoc[1],name,link);
+                }).on('mouseout',function(){
+                    set_tooltip(false);
+                });
                     
                 // draw trendline
                 var regression = leastSquares(

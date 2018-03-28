@@ -36,8 +36,7 @@
               Plant
             </option>
           </select>
-        </div>
-        <input type="submit" action="#" id="load-brapi" class="btn btn-primary" value="Load"> <i id="load-spin" class="fa fa-spinner fa-spin" style="display: none;font-size:14px"></i>
+        </div><input type="submit" action="#" id="load-brapi" class="btn btn-primary" value="Load"> <i id="load-spin" class="fa fa-spinner fa-spin" style="display: none;font-size:14px"></i>
       </form>
       <form id="scomp-form" action="#" class="form-inline" style="margin:1em;" name="scomp-form">
         <div class="form-group">
@@ -69,6 +68,8 @@
 </script> <script type="text/javascript">
 ;(function(){
         
+        var main_url = "";
+        
         $(document).ready(function(){
             $("#brapi-form").submit(function(){
                 var form = $(this).serializeArray().reduce(function(vals,entry){
@@ -83,6 +84,8 @@
                 if (base_url.slice(-1)!="/"){
                     base_url+="/";
                 }
+                
+                main_url = base_url;
                 
                 var server_url = base_url+"brapi/v1";
                 var auth = form.username ? {'username':username,'password':password} : undefined;
@@ -103,7 +106,9 @@
 
         function createSComp(data){
             $("#load-spin").hide();
-            var scomp = StudyComparison();
+            var scomp = StudyComparison().links(function(dbId){
+                return main_url+"stock/"+dbId+"/view";
+            });
             var sharedVars = scomp.loadData(data);
             
             var varOpts = d3.select("#scomp-select-var")
