@@ -66,8 +66,7 @@ export default function(){
                     accession.values.forEach(function(unit){
                         unit.observations.forEach(function(obs){
                             if (accession.variables[obs.observationVariableName]==undefined) {
-                                accession.variables[obs.observationVariableName] = []
-                            } else {
+                                accession.variables[obs.observationVariableName] = [];
                                 thisStudyVariables[obs.observationVariableName] = true;
                             }
                             accession.variables[obs.observationVariableName].push(obs.value)
