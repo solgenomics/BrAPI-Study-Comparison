@@ -385,16 +385,18 @@ function main(){
             
             var tooltip = newSvg.append("a")
                 .classed("grapgr-tooltip",true)
+                .attr('opacity',0)
+                .attr('transform', 'translate(' + 0 + ',' + -100 + ')')
                 .attr("target","_blank");
             tooltip.append('rect')
-                .attr('x',-2).attr('y',-2)
+                .attr('x',-2).attr('y',-15)
                 .attr('width',100)
                 .attr('height',16)
                 .attr('fill','black');
             tooltip.append('text')
                 .attr('fill','white')
                 .attr('text-decoration','underline')
-                .attr('y',10)
+                .attr('y',-3)
                 .attr('x',1)
                 .attr('font-size','12');
             tooltip = tooltip.merge(d3.select('.grapgr-tooltip'));
