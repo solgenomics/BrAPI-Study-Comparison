@@ -73,7 +73,6 @@ function main(){
                         unit.observations.forEach(function(obs){
                             if (accession.variables[obs.observationVariableName]==undefined) {
                                 accession.variables[obs.observationVariableName] = [];
-                            } else {
                                 thisStudyVariables[obs.observationVariableName] = true;
                             }
                             accession.variables[obs.observationVariableName].push(obs.value);
